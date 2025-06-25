@@ -1191,18 +1191,7 @@ Add any other context about the problem here.
     });
   });
 
-  describe('/cli command', () => {
-    it('should execute the command and display the output', async () => {
-      const { handleSlashCommand } = getProcessor();
-      let commandResult: SlashCommandActionReturn | boolean = false;
-      await act(async () => {
-        commandResult = await handleSlashCommand('/cli ls -l');
-      });
-
-      expect(mockAddItem).toHaveBeenCalledTimes(3);
-      expect(commandResult).toBe(true);
-    });
-  });
+  
 
   describe('/compress command', () => {
     it('should call tryCompressChat(true)', async () => {

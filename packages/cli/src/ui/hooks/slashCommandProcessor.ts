@@ -568,32 +568,7 @@ export const useSlashCommandProcessor = (
           });
         },
       },
-      {
-        name: 'cli',
-        description: 'run a cli command',
-        action: async (_mainCommand, subCommand, args) => {
-          const command = `${subCommand} ${args}`;
-          const result = await executeShellCommand(
-            command,
-            config?.getProjectRoot() || process.cwd(),
-            new AbortController().signal,
-            () => {},
-            () => {},
-          );
-
-          let content = '';
-          if (result.output) {
-            content += `stdout:
-${result.output}`;
-          }
-
-          addMessage({
-            type: MessageType.INFO,
-            content,
-            timestamp: new Date(),
-          });
-        },
-      },
+      
       {
         name: 'corgi',
         action: (_mainCommand, _subCommand, _args) => {
