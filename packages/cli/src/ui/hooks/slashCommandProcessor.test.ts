@@ -286,6 +286,25 @@ describe('useSlashCommandProcessor', () => {
   });
 
   describe('Unknown /memory subcommand', () => {
+    it('should show an error for unknown /memory subcommand and return true', async () => {
+      const { handleSlashCommand } = getProcessor();
+      let commandResult: SlashCommandActionReturn | boolean = false;
+      await act(async () => {
+        commandResult = await handleSlashCommand('/memory foobar');
+      });
+      expect(mockAddItem).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          type: MessageType.ERROR,
+          text: 'Unknown /memory command: foobar. Available: show, refresh, add',
+        }),
+        expect.any(Number),
+      );
+      expect(commandResult).toBe(true);
+    });
+  });
+
+  describe('Unknown command', () => {
     it('should execute the command and display the output', async () => {
       const { handleSlashCommand } = getProcessor();
       let commandResult: SlashCommandActionReturn | boolean = false;
@@ -296,6 +315,7 @@ describe('useSlashCommandProcessor', () => {
       expect(mockAddItem).toHaveBeenCalledTimes(2);
       expect(commandResult).toBe(true);
     });
+  });
   });
 
   describe('/stats command', () => {
