@@ -29,6 +29,7 @@ import {
 import { promises as fs } from 'fs';
 import path from 'path';
 import { createShowMemoryAction } from './useShowMemoryCommand.js';
+import { executeShellCommand } from './shellCommandProcessor.js';
 import { GIT_COMMIT_INFO } from '../../generated/git-commit.js';
 import { formatDuration, formatMemoryUsage } from '../utils/formatters.js';
 import { getCliVersion } from '../../utils/version.js';
@@ -568,6 +569,32 @@ export const useSlashCommandProcessor = (
         },
       },
       {
+        name: 'cli',
+        description: 'run a cli command',
+        action: async (_mainCommand, subCommand, args) => {
+          const command = `${subCommand} ${args}`;
+          const result = await executeShellCommand(
+            command,
+            config?.getProjectRoot() || process.cwd(),
+            new AbortController().signal,
+            () => {},
+            () => {},
+          );
+
+          let content = '';
+          if (result.output) {
+            content += `stdout:
+${result.output}`;
+          }
+
+          addMessage({
+            type: MessageType.INFO,
+            content,
+            timestamp: new Date(),
+          });
+        },
+      },
+      {
         name: 'corgi',
         action: (_mainCommand, _subCommand, _args) => {
           toggleCorgiMode();
@@ -1055,9 +1082,23 @@ Add any other context about the problem here.
         }
       }
 
+      const command = trimmed.substring(1);
+      const result = await executeShellCommand(
+        command,
+        config?.getProjectRoot() || process.cwd(),
+        new AbortController().signal,
+        () => {},
+        () => {},
+      );
+
+      let content = '';
+      if (result.output) {
+        content += `stdout:\n${result.output}`;
+      }
+
       addMessage({
-        type: MessageType.ERROR,
-        content: `Unknown command: ${trimmed}`,
+        type: MessageType.INFO,
+        content,
         timestamp: new Date(),
       });
       return true; // Indicate command was processed (even if unknown)

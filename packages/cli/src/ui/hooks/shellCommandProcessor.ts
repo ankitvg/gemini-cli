@@ -45,7 +45,7 @@ interface ShellExecutionResult {
  * @param onDebugMessage A callback for logging debug information.
  * @returns A promise that resolves with the complete execution result.
  */
-function executeShellCommand(
+export function executeShellCommand(
   commandToExecute: string,
   cwd: string,
   abortSignal: AbortSignal,

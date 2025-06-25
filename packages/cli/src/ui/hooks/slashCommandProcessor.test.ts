@@ -87,7 +87,9 @@ vi.mock('../contexts/SessionContext.js', () => ({
   useSessionStats: vi.fn(),
 }));
 
-vi.mock('./useShowMemoryCommand.js', () => ({
+vi.mock('./shellCommandProcessor.js', () => ({
+  executeShellCommand: vi.fn(),
+}));
   SHOW_MEMORY_COMMAND_NAME: '/memory show',
   createShowMemoryAction: vi.fn(() => vi.fn()),
 }));
@@ -284,20 +286,14 @@ describe('useSlashCommandProcessor', () => {
   });
 
   describe('Unknown /memory subcommand', () => {
-    it('should show an error for unknown /memory subcommand and return true', async () => {
+    it('should execute the command and display the output', async () => {
       const { handleSlashCommand } = getProcessor();
       let commandResult: SlashCommandActionReturn | boolean = false;
       await act(async () => {
-        commandResult = await handleSlashCommand('/memory foobar');
+        commandResult = await handleSlashCommand('/ls -l');
       });
-      expect(mockAddItem).toHaveBeenNthCalledWith(
-        2,
-        expect.objectContaining({
-          type: MessageType.ERROR,
-          text: 'Unknown /memory command: foobar. Available: show, refresh, add',
-        }),
-        expect.any(Number),
-      );
+
+      expect(mockAddItem).toHaveBeenCalledTimes(2);
       expect(commandResult).toBe(true);
     });
   });
@@ -1171,6 +1167,19 @@ Add any other context about the problem here.
       expect(message).toContain('param2');
       expect(message).toContain('number');
 
+      expect(commandResult).toBe(true);
+    });
+  });
+
+  describe('/cli command', () => {
+    it('should execute the command and display the output', async () => {
+      const { handleSlashCommand } = getProcessor();
+      let commandResult: SlashCommandActionReturn | boolean = false;
+      await act(async () => {
+        commandResult = await handleSlashCommand('/cli ls -l');
+      });
+
+      expect(mockAddItem).toHaveBeenCalledTimes(3);
       expect(commandResult).toBe(true);
     });
   });
